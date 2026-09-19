@@ -1,0 +1,376 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Haazri - Digital Wage Proof for Daily Wage Workers
+
+Globals:
+  Function:
+    Runtime: nodejs20.x
+    MemorySize: 256
+    Timeout: 15
+    CodeUri: ./
+    Environment:
+      Variables:
+        ATTENDANCE_TABLE: !Ref AttendanceTable
+        WORKERS_TABLE: !Ref WorkersTable
+        SUMMARIES_TABLE: !Ref SummariesTable
+        BUCKET_NAME: !Ref HaazriBucket
+        BEDROCK_MODEL_ID: "anthropic.claude-3-haiku-20240307-v1:0"
+  Api:
+    Cors:
+      AllowMethods: "'GET,POST,PUT,OPTIONS'"
+      AllowHeaders: "'Content-Type,Authorization'"
+      AllowOrigin: "'*'"
+
+Resources:
+
+  # ───────────────────────── API Gateway ─────────────────────────
+  HaazriApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      Auth:
+        DefaultAuthorizer: CognitoAuthorizer
+        # SAM defaults this to true, which attaches the Cognito authorizer to the
+        # auto-generated OPTIONS (CORS preflight) method too. A browser's preflight
+        # request never carries an Authorization header by spec, so that method would
+        # then always 401 — which is exactly the "CORS error" + "401 preflight" seen on
+        # every authenticated call (attendance, profile, everything). This is the real fix.
+        AddDefaultAuthorizerToCorsPreflight: false
+        Authorizers:
+          CognitoAuthorizer:
+            UserPoolArn: !GetAtt HaazriUserPool.Arn
+      # The Globals.Api.Cors property only adds CORS headers to successful Lambda
+      # responses and the OPTIONS preflight — API Gateway's OWN error responses
+      # (401 from a rejected/expired token, 403, 500 from an unhandled Lambda crash)
+      # bypass the Lambda entirely and, by default, carry NO CORS headers at all. A
+      # browser then reports this as a blocked/failed request with no readable status
+      # or body, which looks identical to a generic network failure from the app's
+      # point of view. This explicitly adds CORS headers to those default error
+      # responses too, so real auth/server errors become visible instead of looking
+      # like every other silent failure.
+      GatewayResponses:
+        DEFAULT_4XX:
+          ResponseParameters:
+            Headers:
+              Access-Control-Allow-Origin: "'*'"
+              Access-Control-Allow-Headers: "'Content-Type,Authorization'"
+        DEFAULT_5XX:
+          ResponseParameters:
+            Headers:
+              Access-Control-Allow-Origin: "'*'"
+              Access-Control-Allow-Headers: "'Content-Type,Authorization'"
+
+  # ───────────────────────── DynamoDB ─────────────────────────
+  AttendanceTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: haazri-attendance
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: worker_id
+          AttributeType: S
+        - AttributeName: record_date
+          AttributeType: S
+        - AttributeName: contractor_name
+          AttributeType: S
+      KeySchema:
+        - AttributeName: worker_id
+          KeyType: HASH
+        - AttributeName: record_date
+          KeyType: RANGE
+      GlobalSecondaryIndexes:
+        - IndexName: contractor-index
+          KeySchema:
+            - AttributeName: contractor_name
+              KeyType: HASH
+            - AttributeName: record_date
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+
+  WorkersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: haazri-workers
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: worker_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: worker_id
+          KeyType: HASH
+
+  SummariesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: haazri-summaries
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: worker_id
+          AttributeType: S
+        - AttributeName: month_key
+          AttributeType: S
+      KeySchema:
+        - AttributeName: worker_id
+          KeyType: HASH
+        - AttributeName: month_key
+          KeyType: RANGE
+
+  # ───────────────────────── S3 ─────────────────────────
+  HaazriBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      CorsConfiguration:
+        CorsRules:
+          - AllowedMethods: [GET, PUT]
+            AllowedOrigins: ['*']
+            AllowedHeaders: ['*']
+      LifecycleConfiguration:
+        Rules:
+          - Id: DeleteVoiceAfter90Days
+            Prefix: voice/
+            Status: Enabled
+            ExpirationInDays: 90
+
+  # ───────────────────────── API Lambdas ─────────────────────────
+  RecordAttendanceFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: haazri-record-attendance
+      Handler: src/handlers/record-attendance.handler
+      Policies:
+        # UpdateItem only, no PutItem/DeleteItem/Scan — the IAM-level backing for spec
+        # §15.1's tamper-proofing claim: not just "no delete endpoint exists in code" but
+        # "this role cannot delete an attendance row even if it tried."
+        - Statement:
+            - Effect: Allow
+              Action: [dynamodb:UpdateItem]
+              Resource: !GetAtt AttendanceTable.Arn
+        - DynamoDBReadPolicy: { TableName: !Ref WorkersTable }
+      Events:
+        Post:
+          Type: Api
+          Properties: { RestApiId: !Ref HaazriApi, Path: /v1/attendance, Method: POST }
+
+  GetAttendanceFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: haazri-get-attendance
+      Handler: src/handlers/get-attendance.handler
+      Policies:
+        - DynamoDBReadPolicy: { TableName: !Ref AttendanceTable }
+      Events:
+        Get:
+          Type: Api
+          Properties: { RestApiId: !Ref HaazriApi, Path: /v1/attendance, Method: GET }
+
+  GetProfileFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: haazri-get-profile
+      Handler: src/handlers/get-profile.handler
+      Policies:
+        - DynamoDBReadPolicy: { TableName: !Ref WorkersTable }
+      Events:
+        Get:
+          Type: Api
+          Properties: { RestApiId: !Ref HaazriApi, Path: /v1/worker/profile, Method: GET }
+
+  UpdateProfileFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: haazri-update-profile
+      Handler: src/handlers/update-profile.handler
+      Policies:
+        - DynamoDBCrudPolicy: { TableName: !Ref WorkersTable }
+      Events:
+        Put:
+          Type: Api
+          Properties: { RestApiId: !Ref HaazriApi, Path: /v1/worker/profile, Method: PUT }
+
+  BedrockStructureFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: haazri-bedrock-structure
+      Handler: src/handlers/bedrock-structure.handler
+      Timeout: 20
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action: [bedrock:InvokeModel]
+              Resource: "arn:aws:bedrock:*::foundation-model/anthropic.claude-3-haiku-20240307-v1:0"
+      Events:
+        Post:
+          Type: Api
+          Properties: { RestApiId: !Ref HaazriApi, Path: /v1/voice/structure, Method: POST }
+
+  PresignedUrlFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: haazri-presigned-url
+      Handler: src/handlers/presigned-url.handler
+      Policies:
+        - S3WritePolicy: { BucketName: !Ref HaazriBucket }
+      Events:
+        Post:
+          Type: Api
+          Properties: { RestApiId: !Ref HaazriApi, Path: /v1/media/upload-url, Method: POST }
+
+  GetMediaUrlFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: haazri-get-media-url
+      Handler: src/handlers/get-media-url.handler
+      Policies:
+        - S3ReadPolicy: { BucketName: !Ref HaazriBucket }
+      Events:
+        Get:
+          Type: Api
+          Properties: { RestApiId: !Ref HaazriApi, Path: /v1/media/view-url, Method: GET }
+
+  # ───────────────────────── Monthly summary (stretch) ─────────────────────────
+  MonthlySummaryFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: haazri-monthly-summary
+      Handler: src/handlers/monthly-summary.handler
+      Timeout: 60
+      Policies:
+        - DynamoDBReadPolicy: { TableName: !Ref AttendanceTable }
+        - DynamoDBReadPolicy: { TableName: !Ref WorkersTable }
+        - DynamoDBCrudPolicy: { TableName: !Ref SummariesTable }
+      Events:
+        MonthlyCron:
+          Type: Schedule
+          Properties:
+            Schedule: "cron(30 0 1 * ? *)"   # 06:00 IST on the 1st
+
+  # ───────────────────────── Cognito ─────────────────────────
+  # Cognito requires an SNS-capable IAM role whenever AutoVerifiedAttributes includes
+  # phone_number, even though this app never actually uses Cognito's own SMS sending —
+  # PreSignUpFunction sets autoVerifyPhone=true and OTP delivery goes through our own
+  # CreateAuthChallengeFunction (spec 2.5.6/14). This role exists purely to satisfy that
+  # CloudFormation validation requirement; it is never actually invoked by Cognito here.
+  CognitoSmsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: cognito-idp.amazonaws.com
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals:
+                sts:ExternalId: haazri-sms-external-id
+      Policies:
+        - PolicyName: CognitoSNSPublishPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: sns:Publish
+                Resource: "*"
+
+  HaazriUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: haazri-users
+      UsernameAttributes: [phone_number]
+      AutoVerifiedAttributes: [phone_number]
+      SmsConfiguration:
+        SnsCallerArn: !GetAtt CognitoSmsRole.Arn
+        ExternalId: haazri-sms-external-id
+      Schema:
+        - Name: phone_number
+          Required: true
+          Mutable: false
+      LambdaConfig:
+        PreSignUp: !GetAtt PreSignUpFunction.Arn
+        DefineAuthChallenge: !GetAtt DefineAuthChallengeFunction.Arn
+        CreateAuthChallenge: !GetAtt CreateAuthChallengeFunction.Arn
+        VerifyAuthChallengeResponse: !GetAtt VerifyAuthChallengeResponseFunction.Arn
+
+  HaazriUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      UserPoolId: !Ref HaazriUserPool
+      ExplicitAuthFlows: [ALLOW_CUSTOM_AUTH, ALLOW_REFRESH_TOKEN_AUTH]
+      GenerateSecret: false
+
+  PreSignUpFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: haazri-pre-sign-up
+      Handler: src/auth-triggers/pre-sign-up.handler
+
+  DefineAuthChallengeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: haazri-define-auth-challenge
+      Handler: src/auth-triggers/define-auth-challenge.handler
+
+  CreateAuthChallengeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: haazri-create-auth-challenge
+      Handler: src/auth-triggers/create-auth-challenge.handler
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action: [sns:Publish]
+              Resource: "*"
+
+  VerifyAuthChallengeResponseFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: haazri-verify-auth-challenge
+      Handler: src/auth-triggers/verify-auth-challenge-response.handler
+
+  # Cognito needs explicit permission to invoke each trigger
+  PreSignUpPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref PreSignUpFunction
+      Action: lambda:InvokeFunction
+      Principal: cognito-idp.amazonaws.com
+      SourceArn: !GetAtt HaazriUserPool.Arn
+
+  DefineAuthChallengePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref DefineAuthChallengeFunction
+      Action: lambda:InvokeFunction
+      Principal: cognito-idp.amazonaws.com
+      SourceArn: !GetAtt HaazriUserPool.Arn
+
+  CreateAuthChallengePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref CreateAuthChallengeFunction
+      Action: lambda:InvokeFunction
+      Principal: cognito-idp.amazonaws.com
+      SourceArn: !GetAtt HaazriUserPool.Arn
+
+  VerifyAuthChallengePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref VerifyAuthChallengeResponseFunction
+      Action: lambda:InvokeFunction
+      Principal: cognito-idp.amazonaws.com
+      SourceArn: !GetAtt HaazriUserPool.Arn
+
+Outputs:
+  ApiUrl:
+    Value: !Sub "https://${HaazriApi}.execute-api.${AWS::Region}.amazonaws.com/prod/v1"
+  UserPoolId:
+    Value: !Ref HaazriUserPool
+  UserPoolClientId:
+    Value: !Ref HaazriUserPoolClient
+  BucketName:
+    Value: !Ref HaazriBucket

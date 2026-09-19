@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+
+# Environment files (keep example templates)
+.env
+.env.local
+.env.*.local
+
+# Build outputs
+frontend/build/
+backend/.aws-sam/
+.aws-sam/
+build/
+dist/
+
+# Tooling and IDE caches
+.claude/
+.vscode/
+.idea/
+
+# OS and system files
+.DS_Store
+Thumbs.db
+*.log

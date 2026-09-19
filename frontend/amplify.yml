@@ -1,0 +1,40 @@
+version: 1
+applications:
+  - appRoot: frontend
+    frontend:
+      phases:
+        preBuild:
+          commands:
+            - npm install
+        build:
+          commands:
+            - npm run build
+      artifacts:
+        baseDirectory: build
+        files:
+          - '**/*'
+      cache:
+        paths:
+          - node_modules/**/*
+customHeaders:
+  # index.html/manifest.json/service-worker.js must never be CDN-cached — they're the
+  # entry points that tell the app where the latest hashed JS/CSS lives, so caching them
+  # is what silently blocks "auto-update when I reopen the app." Hashed static assets are
+  # the opposite: their filename changes whenever their content does, so caching them
+  # forever is both safe and desirable.
+  - pattern: '/index.html'
+    headers:
+      - key: 'Cache-Control'
+        value: 'no-cache, no-store, must-revalidate'
+  - pattern: '/service-worker.js'
+    headers:
+      - key: 'Cache-Control'
+        value: 'no-cache, no-store, must-revalidate'
+  - pattern: '/manifest.json'
+    headers:
+      - key: 'Cache-Control'
+        value: 'no-cache, no-store, must-revalidate'
+  - pattern: '/static/**'
+    headers:
+      - key: 'Cache-Control'
+        value: 'public, max-age=31536000, immutable'

@@ -1,0 +1,31 @@
+{
+  "packageId": "in.haazri.twa",
+  "host": "REPLACE_WITH_AMPLIFY_DOMAIN",
+  "name": "हाज़िरी — Haazri",
+  "launcherName": "Haazri",
+  "display": "standalone",
+  "orientation": "portrait",
+  "themeColor": "#0F172A",
+  "navigationColor": "#0F172A",
+  "navigationColorDark": "#0F172A",
+  "backgroundColor": "#0F172A",
+  "startUrl": "/",
+  "iconUrl": "https://REPLACE_WITH_AMPLIFY_DOMAIN/icons/icon-512.png",
+  "maskableIconUrl": "https://REPLACE_WITH_AMPLIFY_DOMAIN/icons/icon-512-maskable.png",
+  "splashScreenFadeOutDuration": 300,
+  "appVersionName": "1.0.0",
+  "appVersionCode": 1,
+  "shortcuts": [],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://REPLACE_WITH_AMPLIFY_DOMAIN/manifest.json",
+  "fallbackType": "customtabs",
+  "features": {
+    "locationDelegation": { "enabled": true }
+  },
+  "enableNotifications": false,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "fullScopeUrl": "/",
+  "minSdkVersion": 21,
+  "shareTarget": null
+}
