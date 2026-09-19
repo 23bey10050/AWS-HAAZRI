@@ -45,10 +45,10 @@ export default function DayDetail({ dateStr, record, onClose, lang = "hi" }) {
     : null;
 
   return (
-    <div className="w-full max-w-sm bg-card/75 backdrop-blur-xl rounded-2xl p-5 flex flex-col gap-3 border border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.3)] animate-fade-in">
+    <div className="w-full max-w-sm bg-card rounded-lg p-5 flex flex-col gap-3 border-2 border-textPrimary/20 shadow-hard-green animate-fade-in">
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold text-textPrimary">{dateStr}</h2>
-        <button onClick={onClose} className="text-textPrimary/60 text-lg">
+        <h2 className="text-xl font-display font-bold text-textPrimary">{dateStr}</h2>
+        <button onClick={onClose} className="text-textPrimary/60 text-lg font-bold">
           {t("day_detail_close", lang)} ✕
         </button>
       </div>
@@ -104,7 +104,11 @@ export default function DayDetail({ dateStr, record, onClose, lang = "hi" }) {
               )}
               {photoState === "error" && <p className="text-deepRed">{t("day_detail_photo_failed", lang)}</p>}
               {photoState === "ready" && (
-                <img src={photoUrl} alt="" className="w-full rounded-lg object-cover max-h-64" />
+                <img
+                  src={photoUrl}
+                  alt=""
+                  className="w-full rounded-lg object-cover max-h-64 border-2 border-textPrimary/20"
+                />
               )}
             </div>
           )}

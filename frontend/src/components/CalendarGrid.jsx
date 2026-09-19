@@ -29,14 +29,14 @@ export default function CalendarGrid({ monthDate, records, onDayClick, selectedD
           <button
             key={day}
             onClick={() => onDayClick?.(dateStrFor(day))}
-            className={`flex flex-col items-center gap-1 py-1 rounded-lg ${
-              selectedDate === dateStrFor(day) ? "bg-white/10 ring-1 ring-primaryGreen" : ""
+            className={`flex flex-col items-center gap-1 py-1 rounded-md border-2 ${
+              selectedDate === dateStrFor(day) ? "border-primaryGreen" : "border-transparent"
             }`}
           >
-            <span className="text-sm text-textPrimary/70">{day}</span>
+            <span className="text-sm text-textPrimary/70 font-bold">{day}</span>
             <span
-              className={`w-3 h-3 rounded-full ${
-                presentDates.has(dateStrFor(day)) ? "bg-primaryGreen" : "bg-white/10"
+              className={`w-3 h-3 rounded-full border border-textPrimary/20 ${
+                presentDates.has(dateStrFor(day)) ? "bg-primaryGreen" : "bg-transparent"
               }`}
             />
           </button>

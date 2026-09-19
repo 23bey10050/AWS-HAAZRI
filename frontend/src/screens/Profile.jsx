@@ -39,32 +39,33 @@ export default function Profile() {
   };
 
   const inputClass =
-    "min-h-[56px] rounded-xl bg-card text-textPrimary text-lg px-4 border border-white/10 focus:border-primaryGreen/60 outline-none transition-colors";
+    "min-h-[56px] rounded-lg bg-card text-textPrimary text-lg px-4 border-2 border-textPrimary/30 focus:border-primaryGreen outline-none";
+  const labelClass = "text-textPrimary/80 text-lg font-bold uppercase tracking-wide";
 
   return (
     <div className="min-h-full bg-background flex flex-col items-center gap-8 px-6 safe-top safe-bottom">
-      <div className="w-20 h-20 rounded-full bg-gradient-to-b from-primaryGreen to-emerald-600 shadow-[0_8px_20px_rgba(34,197,94,0.3)] flex items-center justify-center text-3xl font-bold text-background">
+      <div className="w-20 h-20 bg-primaryGreen border-[3px] border-textPrimary shadow-hard flex items-center justify-center text-3xl font-display font-bold text-background">
         {(displayName || "?").charAt(0).toUpperCase()}
       </div>
-      <h1 className="text-2xl font-bold text-textPrimary -mt-4">{t("profile_title", language)}</h1>
+      <h1 className="text-2xl font-display font-bold text-textPrimary uppercase">{t("profile_title", language)}</h1>
 
       <div className="w-full max-w-sm flex flex-col gap-4">
-        <label className="text-textPrimary/80 text-lg">{t("profile_name", language)}</label>
+        <label className={labelClass}>{t("profile_name", language)}</label>
         <input value={displayName} onChange={(e) => setDisplayName(e.target.value)} className={inputClass} />
 
-        <label className="text-textPrimary/80 text-lg">{t("profile_phone", language)}</label>
+        <label className={labelClass}>{t("profile_phone", language)}</label>
         <input value={phoneNumber} disabled className={`${inputClass} text-textPrimary/50`} />
 
-        <label className="text-textPrimary/80 text-lg">{t("profile_language", language)}</label>
+        <label className={labelClass}>{t("profile_language", language)}</label>
         <div className="flex gap-2">
           {["hi", "en"].map((l) => (
             <button
               key={l}
               onClick={() => setLanguage(l)}
-              className={`flex-1 min-h-[56px] rounded-xl text-lg font-semibold border transition-colors ${
+              className={`flex-1 min-h-[56px] rounded-lg text-lg font-bold border-2 ${
                 language === l
-                  ? "bg-primaryGreen text-textPrimary border-primaryGreen shadow-[0_4px_14px_rgba(34,197,94,0.3)]"
-                  : "bg-card text-textPrimary border-white/10"
+                  ? "bg-primaryGreen text-background border-textPrimary shadow-hard-sm"
+                  : "bg-card text-textPrimary border-textPrimary/30"
               }`}
             >
               {l === "hi" ? "हिन्दी" : "English"}
@@ -72,7 +73,7 @@ export default function Profile() {
           ))}
         </div>
 
-        <label className="text-textPrimary/80 text-lg">{t("profile_wage_rate", language)}</label>
+        <label className={labelClass}>{t("profile_wage_rate", language)}</label>
         <input
           type="number"
           value={wageRate}
@@ -83,7 +84,7 @@ export default function Profile() {
         <button
           onClick={handleSaveProfile}
           disabled={saving}
-          className="min-h-[64px] rounded-xl bg-gradient-to-b from-primaryGreen to-emerald-600 text-textPrimary text-xl font-bold shadow-[0_8px_20px_rgba(34,197,94,0.3)] active:scale-[0.98] transition-transform disabled:opacity-50 flex items-center justify-center gap-2"
+          className="min-h-[64px] rounded-lg bg-primaryGreen text-background text-xl font-display font-bold uppercase border-2 border-textPrimary shadow-hard active:translate-x-[3px] active:translate-y-[3px] active:shadow-hard-sm transition-[transform,box-shadow] duration-100 disabled:opacity-50 flex items-center justify-center gap-2"
         >
           {saving && <Spinner size={22} />}
           {t("profile_save", language)}
@@ -91,7 +92,7 @@ export default function Profile() {
 
         <button
           onClick={logout}
-          className="min-h-[56px] rounded-xl bg-transparent text-deepRed text-lg font-semibold border border-deepRed/60 flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
+          className="min-h-[56px] rounded-lg bg-transparent text-deepRed text-lg font-bold uppercase border-2 border-deepRed flex items-center justify-center gap-2"
         >
           <LogoutIcon />
           {t("profile_logout", language)}

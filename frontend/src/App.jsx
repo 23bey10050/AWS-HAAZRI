@@ -83,7 +83,7 @@ export default function App() {
       {/* key={active.key} forces a fresh mount per tab, so the fade-in replays on
           every switch instead of only on first load — gives tab changes real motion
           instead of an instant, web-page-style swap. */}
-      <div key={active.key} className="animate-fade-in">
+      <div key={active.key} className="h-full animate-fade-in">
         <Active />
       </div>
     </AppShell>

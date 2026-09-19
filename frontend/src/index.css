@@ -39,13 +39,10 @@ body {
    At and above it (desktop/tablet browsers previewing the PWA), render the app as a
    floating "phone" so it reads as a smartphone app instead of a website with a
    narrow centered column — the most common way judges/testers will actually open
-   this URL first. */
+   this URL first. Flat, no gradients — matches the neo-brutalist theme. */
 @media (min-width: 640px) {
   body {
-    background:
-      radial-gradient(circle at 20% 15%, rgba(34, 197, 94, 0.16), transparent 40%),
-      radial-gradient(circle at 85% 75%, rgba(34, 197, 94, 0.10), transparent 45%),
-      #05070d;
+    background-color: #05070d;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -58,15 +55,12 @@ body {
     max-width: 428px;
     height: min(900px, calc(100vh - 5rem));
     max-height: 900px;
-    border-radius: 2.75rem;
+    border-radius: 1.5rem;
     overflow: hidden;
     position: relative;
     background-color: #0F172A;
-    border: 6px solid #14181f;
-    box-shadow:
-      0 40px 90px rgba(0, 0, 0, 0.55),
-      0 0 0 1px rgba(255, 255, 255, 0.06),
-      inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+    border: 3px solid #F8FAFC;
+    box-shadow: 10px 10px 0 0 #22C55E;
   }
 
   /* The notch — purely decorative, reinforces "this is a phone" at a glance */
@@ -77,9 +71,11 @@ body {
     left: 50%;
     transform: translateX(-50%);
     width: 120px;
-    height: 22px;
-    background: #14181f;
-    border-radius: 0 0 16px 16px;
+    height: 20px;
+    background: #05070d;
+    border: 3px solid #F8FAFC;
+    border-top: none;
+    border-radius: 0 0 14px 14px;
     z-index: 50;
   }
 }
@@ -90,14 +86,6 @@ body {
 }
 .animate-fade-in {
   animation: fadeIn 0.22s ease-out;
-}
-
-@keyframes pulseGlow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.35); }
-  50% { box-shadow: 0 0 0 14px rgba(34, 197, 94, 0); }
-}
-.animate-pulse-glow {
-  animation: pulseGlow 2.4s ease-out infinite;
 }
 
 @keyframes spin {

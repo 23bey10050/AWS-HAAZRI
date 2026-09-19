@@ -8,14 +8,7 @@ import React from "react";
 // identical to `fixed` there — full height, full bleed.
 export default function AppShell({ children, nav }) {
   return (
-    <div
-      className="relative h-full w-full overflow-hidden bg-background"
-      style={{
-        backgroundImage:
-          "radial-gradient(circle at 15% 0%, rgba(34,197,94,0.14), transparent 35%), " +
-          "radial-gradient(circle at 90% 100%, rgba(34,197,94,0.08), transparent 40%)",
-      }}
-    >
+    <div className="relative h-full w-full overflow-hidden bg-background">
       <div className="h-full overflow-y-auto">{children}</div>
       {nav}
     </div>

@@ -176,7 +176,7 @@ export default function Home() {
 
       {savedRecord && (
         <div className="w-full max-w-sm flex flex-col gap-3 animate-fade-in">
-          <label className="min-h-[64px] rounded-2xl bg-card/70 backdrop-blur-xl text-textPrimary text-lg font-semibold flex items-center justify-center gap-2 border border-white/10 shadow-[0_6px_20px_rgba(0,0,0,0.2)] active:scale-[0.98] transition-transform">
+          <label className="min-h-[64px] rounded-lg bg-card text-textPrimary text-lg font-bold flex items-center justify-center gap-2 border-2 border-textPrimary/30 shadow-hard-sm active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-[transform,box-shadow] duration-100">
             <input type="file" accept="image/*" capture="environment" className="hidden" onChange={handleAddPhoto} />
             <CameraIcon />
             {t("home_add_photo", lang)}
@@ -187,7 +187,7 @@ export default function Home() {
             <button
               onClick={handleAddVoice}
               disabled={speechBusy}
-              className="min-h-[64px] rounded-2xl bg-card/70 backdrop-blur-xl text-textPrimary text-lg font-semibold border border-white/10 shadow-[0_6px_20px_rgba(0,0,0,0.2)] active:scale-[0.98] transition-transform disabled:opacity-50 flex items-center justify-center gap-2"
+              className="min-h-[64px] rounded-lg bg-card text-textPrimary text-lg font-bold border-2 border-textPrimary/30 shadow-hard-sm active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-[transform,box-shadow] duration-100 disabled:opacity-50 flex items-center justify-center gap-2"
             >
               <MicIcon />
               {t("home_add_voice", lang)}
@@ -198,11 +198,11 @@ export default function Home() {
                 value={noteText}
                 onChange={(e) => setNoteText(e.target.value)}
                 placeholder={t("home_add_note", lang)}
-                className="flex-1 min-h-[56px] rounded-xl bg-card text-textPrimary text-lg px-4 border border-white/10"
+                className="flex-1 min-h-[56px] rounded-lg bg-card text-textPrimary text-lg px-4 border-2 border-textPrimary/30"
               />
               <button
                 onClick={handleAddNote}
-                className="px-4 rounded-xl bg-primaryGreen text-textPrimary font-bold shadow-sm active:scale-[0.98] transition-transform"
+                className="px-4 rounded-lg bg-primaryGreen text-background font-bold border-2 border-textPrimary shadow-hard-sm active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-[transform,box-shadow] duration-100"
               >
                 {t("profile_save", lang)}
               </button>

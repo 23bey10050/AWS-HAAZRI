@@ -77,14 +77,14 @@ export default function Calendar() {
 
   return (
     <div className="min-h-full bg-background flex flex-col items-center gap-6 px-6 safe-top safe-bottom">
-      <h1 className="text-2xl font-bold text-textPrimary">{monthLabel}</h1>
+      <h1 className="text-2xl font-display font-bold text-textPrimary uppercase">{monthLabel}</h1>
 
       {loadError && (
         <div className="w-full max-w-sm flex flex-col gap-2">
           <StatusBanner status="error">{loadError}</StatusBanner>
           <button
             onClick={loadAttendance}
-            className="min-h-[48px] rounded-xl bg-card text-textPrimary border border-white/10 font-semibold"
+            className="min-h-[48px] rounded-lg bg-card text-textPrimary border-2 border-textPrimary/30 font-bold shadow-hard-sm active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-[transform,box-shadow] duration-100"
           >
             {t("retry", lang)}
           </button>
@@ -93,7 +93,7 @@ export default function Calendar() {
 
       {loading && !loadError && <Spinner />}
 
-      <div className="w-full max-w-sm bg-card/70 backdrop-blur-xl rounded-2xl p-4 shadow-[0_8px_24px_rgba(0,0,0,0.2)] border border-white/10">
+      <div className="w-full max-w-sm bg-card rounded-lg p-4 shadow-hard-green border-2 border-textPrimary/20">
         <CalendarGrid
           monthDate={monthDate}
           records={records}
@@ -111,21 +111,21 @@ export default function Calendar() {
         />
       )}
 
-      <div className="w-full max-w-sm bg-card/70 backdrop-blur-xl rounded-2xl p-4 flex justify-between text-lg text-textPrimary shadow-[0_8px_24px_rgba(0,0,0,0.2)] border border-white/10">
+      <div className="w-full max-w-sm bg-card rounded-lg p-4 flex justify-between text-lg text-textPrimary shadow-hard-green border-2 border-textPrimary/20">
         <div>
-          <p className="text-textPrimary/60">{t("calendar_total_days", lang)}</p>
-          <p className="font-bold text-2xl">{summary.total_days}</p>
+          <p className="text-textPrimary/60 font-bold uppercase text-sm tracking-wide">{t("calendar_total_days", lang)}</p>
+          <p className="font-display font-bold text-2xl">{summary.total_days}</p>
         </div>
         <div>
-          <p className="text-textPrimary/60">{t("calendar_total_wages", lang)}</p>
-          <p className="font-bold text-2xl">₹{summary.total_wages}</p>
+          <p className="text-textPrimary/60 font-bold uppercase text-sm tracking-wide">{t("calendar_total_wages", lang)}</p>
+          <p className="font-display font-bold text-2xl">₹{summary.total_wages}</p>
         </div>
       </div>
 
       <button
         onClick={handleShare}
         disabled={sharing}
-        className="w-full max-w-sm min-h-[64px] rounded-xl bg-gradient-to-b from-primaryGreen to-emerald-600 text-textPrimary text-xl font-bold shadow-[0_8px_20px_rgba(34,197,94,0.3)] active:scale-[0.98] transition-transform disabled:opacity-50 flex items-center justify-center gap-2"
+        className="w-full max-w-sm min-h-[64px] rounded-lg bg-primaryGreen text-background text-xl font-display font-bold uppercase border-2 border-textPrimary shadow-hard active:translate-x-[3px] active:translate-y-[3px] active:shadow-hard-sm transition-[transform,box-shadow] duration-100 disabled:opacity-50 flex items-center justify-center gap-2"
       >
         {sharing && <Spinner size={22} />}
         {t("calendar_share_whatsapp", lang)}

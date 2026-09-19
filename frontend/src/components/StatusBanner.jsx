@@ -3,9 +3,9 @@ import { CheckCircleIcon, AlertTriangleIcon, AlertCircleIcon } from "./icons";
 
 // status: "success" (green) | "pending" (amber) | "error" (red, rare by design)
 const CONFIG = {
-  success: { style: "bg-primaryGreen/15 text-primaryGreen border-primaryGreen/40", Icon: CheckCircleIcon },
-  pending: { style: "bg-amber/15 text-amber border-amber/40", Icon: AlertTriangleIcon },
-  error: { style: "bg-deepRed/15 text-deepRed border-deepRed/40", Icon: AlertCircleIcon },
+  success: { style: "bg-primaryGreen/10 text-primaryGreen border-primaryGreen", Icon: CheckCircleIcon },
+  pending: { style: "bg-amber/10 text-amber border-amber", Icon: AlertTriangleIcon },
+  error: { style: "bg-deepRed/10 text-deepRed border-deepRed", Icon: AlertCircleIcon },
 };
 
 export default function StatusBanner({ status = "pending", children }) {
@@ -13,7 +13,7 @@ export default function StatusBanner({ status = "pending", children }) {
   const { style, Icon } = CONFIG[status] ?? CONFIG.pending;
   return (
     <div
-      className={`w-full rounded-2xl border backdrop-blur-md px-4 py-3 flex items-center justify-center gap-2 text-lg font-semibold text-center animate-fade-in ${style}`}
+      className={`w-full rounded-lg border-2 px-4 py-3 flex items-center justify-center gap-2 text-lg font-bold text-center animate-fade-in ${style}`}
     >
       <Icon className="shrink-0" />
       <span>{children}</span>
