@@ -45,7 +45,7 @@ export default function DayDetail({ dateStr, record, onClose, lang = "hi" }) {
     : null;
 
   return (
-    <div className="w-full max-w-sm bg-card rounded-xl p-5 flex flex-col gap-3 border border-white/10">
+    <div className="w-full max-w-sm bg-card rounded-xl p-5 flex flex-col gap-3 border border-white/10 shadow-[0_8px_24px_rgba(0,0,0,0.25)] animate-fade-in">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-bold text-textPrimary">{dateStr}</h2>
         <button onClick={onClose} className="text-textPrimary/60 text-lg">

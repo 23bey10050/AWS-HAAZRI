@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import HaazriButton from "../components/HaazriButton";
 import StatusBanner from "../components/StatusBanner";
+import { CameraIcon, MicIcon } from "../components/icons";
 import { getWorkerProfile, postAttendance, getUploadUrl, structureVoice } from "../api/client";
 import { enqueue, removeFromQueue } from "../hooks/useOfflineQueue";
 import { captureLocation } from "../hooks/useGeolocation";
@@ -168,15 +169,16 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-6 px-6 pb-24">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-6 px-6 safe-bottom">
       <HaazriButton label={t("home_tap_button", lang)} onPress={handleTap} disabled={recording} />
 
       <StatusBanner status={status?.type}>{status?.message}</StatusBanner>
 
       {savedRecord && (
-        <div className="w-full max-w-sm flex flex-col gap-3">
-          <label className="min-h-[64px] rounded-xl bg-card text-textPrimary text-lg font-semibold flex items-center justify-center border border-white/10">
+        <div className="w-full max-w-sm flex flex-col gap-3 animate-fade-in">
+          <label className="min-h-[64px] rounded-xl bg-card text-textPrimary text-lg font-semibold flex items-center justify-center gap-2 border border-white/10 shadow-sm active:scale-[0.98] transition-transform">
             <input type="file" accept="image/*" capture="environment" className="hidden" onChange={handleAddPhoto} />
+            <CameraIcon />
             {t("home_add_photo", lang)}
           </label>
           <StatusBanner status={photoStatus?.type}>{photoStatus?.message}</StatusBanner>
@@ -185,8 +187,9 @@ export default function Home() {
             <button
               onClick={handleAddVoice}
               disabled={speechBusy}
-              className="min-h-[64px] rounded-xl bg-card text-textPrimary text-lg font-semibold border border-white/10 disabled:opacity-50"
+              className="min-h-[64px] rounded-xl bg-card text-textPrimary text-lg font-semibold border border-white/10 shadow-sm active:scale-[0.98] transition-transform disabled:opacity-50 flex items-center justify-center gap-2"
             >
+              <MicIcon />
               {t("home_add_voice", lang)}
             </button>
           ) : (
@@ -199,7 +202,7 @@ export default function Home() {
               />
               <button
                 onClick={handleAddNote}
-                className="px-4 rounded-xl bg-primaryGreen text-textPrimary font-bold"
+                className="px-4 rounded-xl bg-primaryGreen text-textPrimary font-bold shadow-sm active:scale-[0.98] transition-transform"
               >
                 {t("profile_save", lang)}
               </button>

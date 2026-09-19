@@ -7,6 +7,7 @@ import Home from "./screens/Home";
 import Calendar from "./screens/Calendar";
 import Profile from "./screens/Profile";
 import BottomNav from "./components/BottomNav";
+import Spinner from "./components/Spinner";
 import { startBackgroundSync } from "./hooks/useOfflineQueue";
 import { t } from "./i18n/strings";
 
@@ -15,6 +16,15 @@ const TABS = [
   { key: "calendar", labelKey: "nav_calendar", component: Calendar },
   { key: "profile", labelKey: "nav_profile", component: Profile },
 ];
+
+function Splash() {
+  return (
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4">
+      <Spinner size={36} />
+      <p className="text-textPrimary/60 text-lg">{t("loading")}</p>
+    </div>
+  );
+}
 
 export default function App() {
   const { tokens, restoring } = useAuth();
@@ -42,23 +52,11 @@ export default function App() {
 
   // While a persisted session is being silently restored (page reload, app reopen),
   // show a splash instead of flashing the Login screen and then yanking it away.
-  if (restoring) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-textPrimary text-xl">{t("loading")}</p>
-      </div>
-    );
-  }
+  if (restoring) return <Splash />;
 
   if (!tokens) return <Login />;
 
-  if (profileComplete === null) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-textPrimary text-xl">{t("loading")}</p>
-      </div>
-    );
-  }
+  if (profileComplete === null) return <Splash />;
 
   if (!profileComplete) {
     return <ProfileSetup onDone={checkProfile} />;
@@ -69,7 +67,12 @@ export default function App() {
 
   return (
     <>
-      <Active />
+      {/* key={active.key} forces a fresh mount per tab, so the fade-in replays on
+          every switch instead of only on first load — gives tab changes real motion
+          instead of an instant, web-page-style swap. */}
+      <div key={active.key} className="animate-fade-in">
+        <Active />
+      </div>
       <BottomNav
         tabs={TABS.map((s) => ({ key: s.key, label: t(s.labelKey) }))}
         active={active.key}

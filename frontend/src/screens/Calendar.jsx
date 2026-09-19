@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback, useMemo } from "react";
 import CalendarGrid from "../components/CalendarGrid";
 import StatusBanner from "../components/StatusBanner";
 import DayDetail from "../components/DayDetail";
+import Spinner from "../components/Spinner";
 import { getAttendance, getWorkerProfile } from "../api/client";
 import { drawCalendarSummary } from "../utils/canvasSummary";
 import { shareSummaryBlob } from "../utils/whatsappShare";
@@ -75,7 +76,7 @@ export default function Calendar() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center gap-6 px-6 pt-10 pb-24">
+    <div className="min-h-screen bg-background flex flex-col items-center gap-6 px-6 safe-top safe-bottom">
       <h1 className="text-2xl font-bold text-textPrimary">{monthLabel}</h1>
 
       {loadError && (
@@ -90,9 +91,9 @@ export default function Calendar() {
         </div>
       )}
 
-      {loading && !loadError && <p className="text-textPrimary/60">{t("loading", lang)}</p>}
+      {loading && !loadError && <Spinner />}
 
-      <div className="w-full max-w-sm">
+      <div className="w-full max-w-sm bg-card rounded-xl p-4 shadow-sm border border-white/5">
         <CalendarGrid
           monthDate={monthDate}
           records={records}
@@ -110,7 +111,7 @@ export default function Calendar() {
         />
       )}
 
-      <div className="w-full max-w-sm bg-card rounded-xl p-4 flex justify-between text-lg text-textPrimary">
+      <div className="w-full max-w-sm bg-card rounded-xl p-4 flex justify-between text-lg text-textPrimary shadow-sm border border-white/5">
         <div>
           <p className="text-textPrimary/60">{t("calendar_total_days", lang)}</p>
           <p className="font-bold text-2xl">{summary.total_days}</p>
@@ -124,8 +125,9 @@ export default function Calendar() {
       <button
         onClick={handleShare}
         disabled={sharing}
-        className="w-full max-w-sm min-h-[64px] rounded-xl bg-primaryGreen text-textPrimary text-xl font-bold disabled:opacity-50"
+        className="w-full max-w-sm min-h-[64px] rounded-xl bg-gradient-to-b from-primaryGreen to-emerald-600 text-textPrimary text-xl font-bold shadow-[0_8px_20px_rgba(34,197,94,0.3)] active:scale-[0.98] transition-transform disabled:opacity-50 flex items-center justify-center gap-2"
       >
+        {sharing && <Spinner size={22} />}
         {t("calendar_share_whatsapp", lang)}
       </button>
     </div>
