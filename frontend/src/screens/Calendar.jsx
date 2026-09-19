@@ -76,7 +76,7 @@ export default function Calendar() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center gap-6 px-6 safe-top safe-bottom">
+    <div className="min-h-full bg-background flex flex-col items-center gap-6 px-6 safe-top safe-bottom">
       <h1 className="text-2xl font-bold text-textPrimary">{monthLabel}</h1>
 
       {loadError && (
@@ -93,7 +93,7 @@ export default function Calendar() {
 
       {loading && !loadError && <Spinner />}
 
-      <div className="w-full max-w-sm bg-card rounded-xl p-4 shadow-sm border border-white/5">
+      <div className="w-full max-w-sm bg-card/70 backdrop-blur-xl rounded-2xl p-4 shadow-[0_8px_24px_rgba(0,0,0,0.2)] border border-white/10">
         <CalendarGrid
           monthDate={monthDate}
           records={records}
@@ -111,7 +111,7 @@ export default function Calendar() {
         />
       )}
 
-      <div className="w-full max-w-sm bg-card rounded-xl p-4 flex justify-between text-lg text-textPrimary shadow-sm border border-white/5">
+      <div className="w-full max-w-sm bg-card/70 backdrop-blur-xl rounded-2xl p-4 flex justify-between text-lg text-textPrimary shadow-[0_8px_24px_rgba(0,0,0,0.2)] border border-white/10">
         <div>
           <p className="text-textPrimary/60">{t("calendar_total_days", lang)}</p>
           <p className="font-bold text-2xl">{summary.total_days}</p>

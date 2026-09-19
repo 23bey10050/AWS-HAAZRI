@@ -41,7 +41,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-8 px-6">
+    <div className="min-h-full bg-background flex flex-col items-center justify-center gap-8 px-6">
       <div className="flex flex-col items-center gap-4">
         <div className="w-20 h-20 rounded-3xl bg-gradient-to-b from-primaryGreen to-emerald-600 shadow-[0_10px_28px_rgba(34,197,94,0.35)] flex items-center justify-center text-4xl font-black text-background">
           ह

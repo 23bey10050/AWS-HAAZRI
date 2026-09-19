@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useAuth } from "./auth/AuthContext";
 import { getWorkerProfile } from "./api/client";
+import AppShell from "./components/AppShell";
 import Login from "./screens/Login";
 import ProfileSetup from "./screens/ProfileSetup";
 import Home from "./screens/Home";
@@ -19,7 +20,7 @@ const TABS = [
 
 function Splash() {
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4">
+    <div className="min-h-full flex flex-col items-center justify-center gap-4">
       <Spinner size={36} />
       <p className="text-textPrimary/60 text-lg">{t("loading")}</p>
     </div>
@@ -52,32 +53,39 @@ export default function App() {
 
   // While a persisted session is being silently restored (page reload, app reopen),
   // show a splash instead of flashing the Login screen and then yanking it away.
-  if (restoring) return <Splash />;
+  if (restoring) return <AppShell><Splash /></AppShell>;
 
-  if (!tokens) return <Login />;
+  if (!tokens) return <AppShell><Login /></AppShell>;
 
-  if (profileComplete === null) return <Splash />;
+  if (profileComplete === null) return <AppShell><Splash /></AppShell>;
 
   if (!profileComplete) {
-    return <ProfileSetup onDone={checkProfile} />;
+    return (
+      <AppShell>
+        <ProfileSetup onDone={checkProfile} />
+      </AppShell>
+    );
   }
 
   const active = TABS.find((s) => s.key === activeTab) ?? TABS[0];
   const Active = active.component;
 
   return (
-    <>
+    <AppShell
+      nav={
+        <BottomNav
+          tabs={TABS.map((s) => ({ key: s.key, label: t(s.labelKey) }))}
+          active={active.key}
+          onChange={setActiveTab}
+        />
+      }
+    >
       {/* key={active.key} forces a fresh mount per tab, so the fade-in replays on
           every switch instead of only on first load — gives tab changes real motion
           instead of an instant, web-page-style swap. */}
       <div key={active.key} className="animate-fade-in">
         <Active />
       </div>
-      <BottomNav
-        tabs={TABS.map((s) => ({ key: s.key, label: t(s.labelKey) }))}
-        active={active.key}
-        onChange={setActiveTab}
-      />
-    </>
+    </AppShell>
   );
 }

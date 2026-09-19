@@ -169,14 +169,14 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-6 px-6 safe-bottom">
+    <div className="min-h-full bg-background flex flex-col items-center justify-center gap-6 px-6 safe-bottom">
       <HaazriButton label={t("home_tap_button", lang)} onPress={handleTap} disabled={recording} />
 
       <StatusBanner status={status?.type}>{status?.message}</StatusBanner>
 
       {savedRecord && (
         <div className="w-full max-w-sm flex flex-col gap-3 animate-fade-in">
-          <label className="min-h-[64px] rounded-xl bg-card text-textPrimary text-lg font-semibold flex items-center justify-center gap-2 border border-white/10 shadow-sm active:scale-[0.98] transition-transform">
+          <label className="min-h-[64px] rounded-2xl bg-card/70 backdrop-blur-xl text-textPrimary text-lg font-semibold flex items-center justify-center gap-2 border border-white/10 shadow-[0_6px_20px_rgba(0,0,0,0.2)] active:scale-[0.98] transition-transform">
             <input type="file" accept="image/*" capture="environment" className="hidden" onChange={handleAddPhoto} />
             <CameraIcon />
             {t("home_add_photo", lang)}
@@ -187,7 +187,7 @@ export default function Home() {
             <button
               onClick={handleAddVoice}
               disabled={speechBusy}
-              className="min-h-[64px] rounded-xl bg-card text-textPrimary text-lg font-semibold border border-white/10 shadow-sm active:scale-[0.98] transition-transform disabled:opacity-50 flex items-center justify-center gap-2"
+              className="min-h-[64px] rounded-2xl bg-card/70 backdrop-blur-xl text-textPrimary text-lg font-semibold border border-white/10 shadow-[0_6px_20px_rgba(0,0,0,0.2)] active:scale-[0.98] transition-transform disabled:opacity-50 flex items-center justify-center gap-2"
             >
               <MicIcon />
               {t("home_add_voice", lang)}

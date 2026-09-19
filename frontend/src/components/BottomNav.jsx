@@ -6,7 +6,7 @@ const ICONS = { home: HomeIcon, calendar: CalendarIcon, profile: ProfileIcon };
 // tabs: [{ key, label }]. Role-agnostic — App.jsx decides which tabs exist.
 export default function BottomNav({ tabs, active, onChange }) {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 nav-safe-bottom bg-card/95 backdrop-blur-md border-t border-white/10 shadow-[0_-4px_20px_rgba(0,0,0,0.25)]">
+    <nav className="absolute bottom-0 left-0 right-0 nav-safe-bottom bg-card/70 backdrop-blur-xl border-t border-white/10 shadow-[0_-4px_20px_rgba(0,0,0,0.25)]">
       <div className="flex">
         {tabs.map((tab) => {
           const Icon = ICONS[tab.key];

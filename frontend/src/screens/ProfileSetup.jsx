@@ -38,7 +38,7 @@ export default function ProfileSetup({ onDone }) {
     "min-h-[56px] rounded-xl bg-card text-textPrimary text-lg px-4 border border-white/10 focus:border-primaryGreen/60 outline-none transition-colors";
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-6 px-6">
+    <div className="min-h-full bg-background flex flex-col items-center justify-center gap-6 px-6">
       <div className="w-16 h-16 rounded-2xl bg-gradient-to-b from-primaryGreen to-emerald-600 shadow-[0_8px_20px_rgba(34,197,94,0.3)] flex items-center justify-center text-3xl font-black text-background">
         ह
       </div>

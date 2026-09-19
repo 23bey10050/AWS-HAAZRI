@@ -13,7 +13,7 @@ export default function StatusBanner({ status = "pending", children }) {
   const { style, Icon } = CONFIG[status] ?? CONFIG.pending;
   return (
     <div
-      className={`w-full rounded-xl border px-4 py-3 flex items-center justify-center gap-2 text-lg font-semibold text-center animate-fade-in ${style}`}
+      className={`w-full rounded-2xl border backdrop-blur-md px-4 py-3 flex items-center justify-center gap-2 text-lg font-semibold text-center animate-fade-in ${style}`}
     >
       <Icon className="shrink-0" />
       <span>{children}</span>
